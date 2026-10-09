@@ -4,6 +4,8 @@
 
 Loja online de computadores onde você **monta o seu PC peça por peça**, com checagem de compatibilidade em tempo real, ou escolhe um PC pronto. Tem também um **painel administrativo** para acompanhar vendas, mudar a situação dos pedidos e alterar preços.
 
+**Veja no ar: [proware.onrender.com](https://proware.onrender.com)** (o primeiro acesso pode levar cerca de 1 minuto, enquanto o servidor gratuito acorda). Os acessos de teste da loja e do painel aparecem na página de login.
+
 O projeto começou no ensino médio como um site estático de quatro páginas. Esta é a versão 2.0, refeita do zero **com as mesmas linguagens** (HTML, CSS, JavaScript e PHP), sem frameworks.
 
 ![Página inicial da Proware](docs/img/inicio.jpg)
