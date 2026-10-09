@@ -1,2 +1,13 @@
 # Backup compactado da versão original (fica só na máquina)
 *.rar
+
+# Dados gerados pela loja (clientes, pedidos e mensagens)
+app/storage/*
+!app/storage/.gitkeep
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
