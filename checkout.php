@@ -134,7 +134,7 @@ require APP . '/views/topo.php';
                     <?= erro_campo($erros, 'pagamento') ?>
                     <div class="alerta alerta--info alerta--compacto">
                         <?= icone('info') ?>
-                        <p>Esta é uma loja de demonstração: nenhum valor é cobrado e nenhum dado de cartão é pedido.</p>
+                        <p>Esta é uma loja de demonstração: nenhum valor é cobrado e nenhum dado de cartão é pedido. Se quiser testar, use um endereço fictício.</p>
                     </div>
                 </fieldset>
             </form>

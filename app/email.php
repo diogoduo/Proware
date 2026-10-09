@@ -27,17 +27,31 @@ function emails_silenciados(?bool $silenciar = null): bool
     return $silenciados;
 }
 
-/** Endereço completo do site, para os links dentro dos e-mails. */
-function url_do_site(string $caminho = ''): string
+/**
+ * Endereço completo do site, para os links dentro dos e-mails (ou null se não
+ * houver um endereço confiável).
+ *
+ * Nunca usa o cabeçalho Host de um site publicado: quem faz a requisição escolhe
+ * esse valor e poderia receber, num e-mail de outra pessoa, um link de nova senha
+ * apontando para o site dele. As fontes aceitas são APP_URL, o endereço que o
+ * Render informa (RENDER_EXTERNAL_URL) e, só no próprio computador, o localhost.
+ */
+function url_do_site(string $caminho = ''): ?string
 {
-    $base = getenv('APP_URL');
-    if (!$base && !empty($_SERVER['HTTP_HOST'])) {
-        $https = ($_SERVER['HTTPS'] ?? '') === 'on' || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    $base = getenv('APP_URL') ?: getenv('RENDER_EXTERNAL_URL');
+
+    if (!$base && preg_match('/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/', $_SERVER['HTTP_HOST'] ?? '')) {
         $pasta = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
-        $pasta = preg_replace('#/admin$#', '', $pasta);
-        $base = ($https ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $pasta;
+        $base = 'http://' . $_SERVER['HTTP_HOST'] . preg_replace('#/admin$#', '', $pasta);
     }
-    return rtrim($base ?: 'http://localhost:8000', '/') . '/' . ltrim($caminho, '/');
+    if (!$base && PHP_SAPI === 'cli') {
+        $base = 'http://localhost:8000';
+    }
+    if (!$base) {
+        error_log('Defina a variável APP_URL com o endereço do site para os links dos e-mails funcionarem.');
+        return null;
+    }
+    return rtrim($base, '/') . '/' . ltrim($caminho, '/');
 }
 
 /**
@@ -146,6 +160,12 @@ function modelo_email(string $titulo, array $paragrafos, ?array $botao = null, a
     return ['html' => $html, 'texto' => $texto];
 }
 
+/** Botão de um e-mail, ou nenhum se o site não tiver um endereço confiável. */
+function botao_email(string $rotulo, ?string $link): ?array
+{
+    return $link ? [$rotulo, $link] : null;
+}
+
 function email_pedido_confirmado(array $usuario, array $pedido): void
 {
     $linhas = array_map(fn ($i) => ["{$i['qtd']}× {$i['nome']}", brl($i['preco'] * $i['qtd'])], $pedido['itens']);
@@ -163,7 +183,7 @@ function email_pedido_confirmado(array $usuario, array $pedido): void
     $email = modelo_email(
         'Recebemos o seu pedido!',
         ['Olá, ' . primeiro_nome($usuario['nome']) . '! Obrigado por comprar na Proware.', $proximoPasso],
-        ['Acompanhar pedido', url_do_site('pedido.php?codigo=' . $pedido['codigo'])],
+        botao_email('Acompanhar pedido', url_do_site('pedido.php?codigo=' . $pedido['codigo'])),
         $linhas
     );
     enviar_email($usuario['email'], $usuario['nome'], "Pedido {$pedido['codigo']} recebido", $email['html'], $email['texto'], 'pedido');
@@ -186,7 +206,7 @@ function email_status_do_pedido(array $pedido): void
     $email = modelo_email(
         $titulo,
         ['Olá, ' . primeiro_nome($pedido['cliente_nome']) . '!', $texto],
-        ['Ver o pedido', url_do_site('pedido.php?codigo=' . $pedido['codigo'])]
+        botao_email('Ver o pedido', url_do_site('pedido.php?codigo=' . $pedido['codigo']))
     );
     enviar_email($pedido['cliente_email'], $pedido['cliente_nome'], "Pedido {$pedido['codigo']}: $titulo", $email['html'], $email['texto'], 'pedido');
 }

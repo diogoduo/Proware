@@ -40,6 +40,25 @@ function url_raiz(string $caminho = ''): string
     return (defined('NA_AREA_ADMIN') ? '../' : '') . $caminho;
 }
 
+/**
+ * IP de quem fez a requisição. No Render (ou em outro site atrás da Cloudflare,
+ * com CONFIAR_CLOUDFLARE=1), REMOTE_ADDR é o IP do proxy; o IP real vem em
+ * CF-Connecting-IP, que a Cloudflare sempre sobrescreve. O X-Forwarded-For não
+ * é usado porque o próprio visitante consegue forjá-lo.
+ */
+function ip_do_cliente(): string
+{
+    $atrasDaCloudflare = getenv('RENDER') === 'true' || getenv('CONFIAR_CLOUDFLARE') === '1';
+    $campos = $atrasDaCloudflare ? ['HTTP_CF_CONNECTING_IP', 'HTTP_TRUE_CLIENT_IP', 'REMOTE_ADDR'] : ['REMOTE_ADDR'];
+    foreach ($campos as $campo) {
+        $ip = $_SERVER[$campo] ?? '';
+        if (filter_var($ip, FILTER_VALIDATE_IP)) {
+            return $ip;
+        }
+    }
+    return 'local';
+}
+
 function redirecionar(string $url): void
 {
     header('Location: ' . $url, true, 303);
@@ -204,6 +223,14 @@ function valor_compacto(float $valor): string
         return 'R$ ' . rtrim(rtrim(number_format($valor / 1000, 1, ',', '.'), '0'), ',') . ' mil';
     }
     return 'R$ ' . number_format($valor, 0, ',', '.');
+}
+
+/** Iniciais do primeiro e do último nome: "Maria Eduarda Sachi" → "MS". */
+function iniciais(string $nome): string
+{
+    $partes = preg_split('/\s+/', trim($nome)) ?: [''];
+    $letras = mb_substr_seguro($partes[0], 0, 1) . (count($partes) > 1 ? mb_substr_seguro(end($partes), 0, 1) : '');
+    return mb_strtoupper_seguro($letras);
 }
 
 function primeiro_nome(string $nome): string

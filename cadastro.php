@@ -55,6 +55,13 @@ require APP . '/views/topo.php';
                 <div class="alerta alerta--erro" role="alert"><?= icone('alerta') ?><p>Confira os campos destacados abaixo.</p></div>
             <?php endif; ?>
 
+            <?php if (modo_demonstracao()): ?>
+                <div class="alerta alerta--info">
+                    <?= icone('info') ?>
+                    <p><strong>Este é um site de portfólio: use dados fictícios.</strong> Nada é cobrado, e as contas são apagadas quando o servidor reinicia. Se quiser, gere um CPF de teste no botão acima do campo.</p>
+                </div>
+            <?php endif; ?>
+
             <form class="formulario" method="post" action="cadastro.php" novalidate data-validar>
                 <?= campo_csrf() ?>
                 <input type="hidden" name="voltar" value="<?= e($voltar) ?>">
@@ -71,7 +78,14 @@ require APP . '/views/topo.php';
                 </div>
                 <div class="formulario__linha">
                     <div class="campo<?= isset($erros['cpf']) ? ' campo--erro' : '' ?>">
-                        <label for="cpf">CPF</label>
+                        <?php if (modo_demonstracao()): ?>
+                            <div class="campo__rotulo-linha">
+                                <label for="cpf">CPF</label>
+                                <button class="botao-link" type="button" data-gerar-cpf="cpf">Gerar CPF de teste</button>
+                            </div>
+                        <?php else: ?>
+                            <label for="cpf">CPF</label>
+                        <?php endif; ?>
                         <input id="cpf" name="cpf" type="text" inputmode="numeric" autocomplete="off" required placeholder="000.000.000-00" data-mascara="cpf" value="<?= e($dados['cpf']) ?>"<?= attr_erro($erros, 'cpf') ?>>
                         <?= erro_campo($erros, 'cpf') ?>
                     </div>

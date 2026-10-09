@@ -25,8 +25,9 @@ if (requisicao_post()) {
     } else {
         registrar_falha_login($chaveLimite);
         $usuario = usuario_por_email($email);
-        if ($usuario) {
-            email_recuperacao_senha($usuario, criar_link_redefinicao($usuario));
+        $link = $usuario ? criar_link_redefinicao($usuario) : null;
+        if ($link) {
+            email_recuperacao_senha($usuario, $link);
         }
         // A resposta é sempre a mesma, exista ou não uma conta com o e-mail.
         $enviado = true;

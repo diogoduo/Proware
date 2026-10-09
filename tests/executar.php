@@ -357,6 +357,46 @@ teste('gera os dados de demonstração sem disparar e-mails', function () {
     iguais(1, contar_pedidos_por_status()['cancelado'] >= 1 ? 1 : 0, 'há pedido cancelado');
 });
 
+/* ---------- Correções de segurança ---------- */
+
+teste('link dos e-mails não usa o cabeçalho Host de quem pede', function () {
+    $_SERVER['HTTP_HOST'] = 'site-falso.com';
+    try {
+        putenv('APP_URL=https://proware.exemplo.dev/');
+        iguais('https://proware.exemplo.dev/redefinir-senha.php', url_do_site('redefinir-senha.php'), 'APP_URL');
+        putenv('APP_URL');
+        putenv('RENDER_EXTERNAL_URL=https://proware.onrender.com');
+        iguais('https://proware.onrender.com/pedido.php', url_do_site('pedido.php'), 'endereço do Render');
+        putenv('RENDER_EXTERNAL_URL');
+        confirmar(!str_contains((string) url_do_site('x.php'), 'site-falso.com'), 'usou o Host forjado');
+    } finally {
+        putenv('APP_URL');
+        putenv('RENDER_EXTERNAL_URL');
+        unset($_SERVER['HTTP_HOST']);
+    }
+});
+
+teste('IP do visitante só vem da Cloudflare quando o site está atrás dela', function () {
+    $_SERVER['REMOTE_ADDR'] = '10.0.0.5';
+    $_SERVER['HTTP_CF_CONNECTING_IP'] = '200.150.10.20';
+    try {
+        iguais('10.0.0.5', ip_do_cliente(), 'fora do Render ignora o cabeçalho');
+        putenv('RENDER=true');
+        iguais('200.150.10.20', ip_do_cliente(), 'no Render usa o IP real');
+        $_SERVER['HTTP_CF_CONNECTING_IP'] = 'não é um IP';
+        iguais('10.0.0.5', ip_do_cliente(), 'cabeçalho inválido');
+    } finally {
+        putenv('RENDER');
+        unset($_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_CF_CONNECTING_IP']);
+    }
+});
+
+teste('mostra as iniciais da equipe no lugar das fotos', function () {
+    iguais('MS', iniciais('Maria Eduarda Sachi'));
+    iguais('BC', iniciais('Bárbara Cziniel'));
+    iguais(8, count(EQUIPE_ORIGINAL), 'tamanho da equipe');
+});
+
 /* ---------- Execução ---------- */
 
 $falhas = 0;

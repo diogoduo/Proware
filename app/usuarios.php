@@ -135,7 +135,7 @@ function autenticar(string $email, string $senha): ?array
 
 function chave_tentativa_login(string $email): string
 {
-    return hash('sha256', strtolower(trim($email)) . '|' . ($_SERVER['REMOTE_ADDR'] ?? 'local'));
+    return hash('sha256', strtolower(trim($email)) . '|' . ip_do_cliente());
 }
 
 /** Minutos que faltam para poder tentar de novo (0 = liberado). */
@@ -243,13 +243,17 @@ const VALIDADE_LINK_SENHA = 3600; // 1 hora
  * Cria um link de redefinição de senha. Só o hash do token fica no banco:
  * quem tiver acesso ao banco não consegue usar o link.
  */
-function criar_link_redefinicao(array $usuario): string
+function criar_link_redefinicao(array $usuario): ?string
 {
+    $pagina = url_do_site('redefinir-senha.php');
+    if ($pagina === null) {
+        return null; // sem endereço confiável, não há como mandar um link seguro
+    }
     $token = bin2hex(random_bytes(32));
     sql('UPDATE redefinicoes_senha SET usado_em = ? WHERE usuario_id = ? AND usado_em IS NULL', [time(), $usuario['id']]);
     sql('INSERT INTO redefinicoes_senha (usuario_id, token_hash, expira_em, criado_em) VALUES (?, ?, ?, ?)',
         [$usuario['id'], hash('sha256', $token), time() + VALIDADE_LINK_SENHA, agora()]);
-    return url_do_site('redefinir-senha.php?token=' . $token);
+    return $pagina . '?token=' . $token;
 }
 
 /** Usuário dono de um token ainda válido (ou null se expirou, foi usado ou não existe). */

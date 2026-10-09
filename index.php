@@ -7,7 +7,6 @@ $pagina = 'inicio';
 $pcsDestaque = array_filter(produtos_do_tipo('pc'), fn ($p) => $p['destaque']);
 $perifericos = array_filter(produtos_do_tipo('periferico'), fn ($p) => $p['destaque']);
 $exemplo = perfis()['jogos']['pecas'];
-$equipe = ['barbara', 'caio', 'diogo', 'eduardo', 'estela', 'gabriel', 'luan', 'maria-eduarda'];
 
 require APP . '/views/topo.php';
 ?>
@@ -196,8 +195,8 @@ require APP . '/views/topo.php';
             </div>
         </div>
         <ul class="avatares" aria-hidden="true">
-            <?php foreach ($equipe as $pessoa): ?>
-                <li><img src="assets/img/equipe/<?= e($pessoa) ?>.jpg" alt="" width="72" height="72" loading="lazy"></li>
+            <?php foreach (EQUIPE_ORIGINAL as $i => $nome): ?>
+                <li><span class="avatar iniciais--<?= $i % 4 ?>"><?= e(iniciais($nome)) ?></span></li>
             <?php endforeach; ?>
         </ul>
     </div>

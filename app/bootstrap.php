@@ -13,9 +13,15 @@ define('STORAGE', APP . '/storage');
 const LOJA = [
     'nome'      => 'Proware',
     'slogan'    => 'PCs montados do seu jeito',
-    // Troque pelos dados reais antes de publicar.
-    'email'     => 'contato@proware.com.br',
+    // Domínio reservado para exemplos (não pertence a ninguém). Troque por um e-mail seu.
+    'email'     => 'contato@proware.example',
     'horario'   => 'Seg. a sex., das 9h às 18h',
+];
+
+/** Quem fez a versão original da Proware, no ensino médio. */
+const EQUIPE_ORIGINAL = [
+    'Bárbara Cziniel', 'Caio Caram', 'Diogo Duo', 'Eduardo Giovannini',
+    'Estela Maria', 'Gabriel Forte', 'Luan Fogaça', 'Maria Eduarda Sachi',
 ];
 
 const DESCONTO_PIX = 0.05;   // 5% de desconto no Pix

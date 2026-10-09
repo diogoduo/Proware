@@ -6,16 +6,6 @@ $subtitulo = 'A mais nova loja futurística de computadores.';
 $descricao = 'Conheça a Proware e a equipe que ajuda você a montar o computador certo para as suas necessidades.';
 $pagina = 'sobre';
 
-$equipe = [
-    ['nome' => 'Bárbara Cziniel',      'foto' => 'barbara'],
-    ['nome' => 'Caio Caram',           'foto' => 'caio'],
-    ['nome' => 'Diogo Duo',            'foto' => 'diogo'],
-    ['nome' => 'Eduardo Giovannini',   'foto' => 'eduardo'],
-    ['nome' => 'Estela Maria',         'foto' => 'estela'],
-    ['nome' => 'Gabriel Forte',        'foto' => 'gabriel'],
-    ['nome' => 'Luan Fogaça',          'foto' => 'luan'],
-    ['nome' => 'Maria Eduarda Sachi',  'foto' => 'maria-eduarda'],
-];
 
 require APP . '/views/topo.php';
 parcial('topo-pagina', compact('titulo', 'subtitulo'));
@@ -74,10 +64,10 @@ parcial('topo-pagina', compact('titulo', 'subtitulo'));
             </div>
         </div>
         <ul class="grade-equipe">
-            <?php foreach ($equipe as $pessoa): ?>
+            <?php foreach (EQUIPE_ORIGINAL as $i => $nome): ?>
                 <li class="membro">
-                    <img src="assets/img/equipe/<?= e($pessoa['foto']) ?>.jpg" alt="Foto de <?= e($pessoa['nome']) ?>" width="240" height="240" loading="lazy">
-                    <h3><?= e($pessoa['nome']) ?></h3>
+                    <span class="membro__iniciais iniciais--<?= $i % 4 ?>" aria-hidden="true"><?= e(iniciais($nome)) ?></span>
+                    <h3><?= e($nome) ?></h3>
                     <p>Equipe fundadora</p>
                 </li>
             <?php endforeach; ?>

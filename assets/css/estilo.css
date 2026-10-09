@@ -1351,12 +1351,34 @@ address {
   margin-left: -16px;
 }
 
-.avatares img {
+.avatar {
+  display: grid;
+  place-items: center;
   width: 68px;
   height: 68px;
   border: 4px solid var(--escuro);
   border-radius: 50%;
-  object-fit: cover;
+  color: #fff;
+  font-family: var(--fonte-titulo);
+  font-size: 21px;
+  font-weight: 700;
+}
+
+/* Cores das iniciais da equipe (texto branco grande, contraste acima de 3:1) */
+.iniciais--0 {
+  background: linear-gradient(135deg, #8a3be0, #5f1fae);
+}
+
+.iniciais--1 {
+  background: linear-gradient(135deg, #3b82d6, #1e5aa8);
+}
+
+.iniciais--2 {
+  background: linear-gradient(135deg, #1f9e78, #137257);
+}
+
+.iniciais--3 {
+  background: linear-gradient(135deg, #d6336c, #9a2bd1);
 }
 
 .faixa-chamada {
@@ -2574,9 +2596,19 @@ li:not(.is-escolhido) .resumo-montagem__peca span {
   gap: 12px;
 }
 
-.campo__rotulo-linha a {
+.campo__rotulo-linha a,
+.botao-link {
   font-size: 13.5px;
   font-weight: 500;
+}
+
+.botao-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--roxo);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .autenticacao--simples {
@@ -3338,15 +3370,22 @@ input:disabled {
   text-align: center;
 }
 
-.membro img {
-  width: 100%;
+.membro__iniciais {
+  display: grid;
+  place-items: center;
+  width: min(100%, 152px);
   aspect-ratio: 1;
-  border-radius: 20px;
-  object-fit: cover;
+  margin-inline: auto;
+  border-radius: 50%;
+  color: #fff;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
   transition: transform var(--transicao), box-shadow var(--transicao);
 }
 
-.membro:hover img {
+.membro:hover .membro__iniciais {
   transform: translateY(-4px);
   box-shadow: 0 18px 36px -16px rgb(122 47 208 / 0.6);
 }
@@ -3778,9 +3817,10 @@ input:disabled {
     row-gap: 8px;
   }
 
-  .avatares img {
+  .avatar {
     width: 56px;
     height: 56px;
+    font-size: 18px;
   }
 
   .avatares li {

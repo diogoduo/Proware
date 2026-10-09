@@ -514,6 +514,28 @@
     });
   }
 
+  /* ---------- CPF de teste (modo demonstração) ---------- */
+  // Gera um CPF com dígitos verificadores válidos, para ninguém precisar usar o seu.
+
+  function gerarCpf() {
+    const digitos = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
+    for (let posicao = 9; posicao < 11; posicao++) {
+      const soma = digitos.reduce((total, d, i) => total + d * (posicao + 1 - i), 0);
+      digitos.push(((10 * soma) % 11) % 10);
+    }
+    const cpf = digitos.join('');
+    return new Set(cpf).size === 1 ? gerarCpf() : cpf; // todos os dígitos iguais é inválido
+  }
+
+  document.addEventListener('click', (evento) => {
+    const botao = evento.target.closest('[data-gerar-cpf]');
+    if (!botao) return;
+    const campo = document.getElementById(botao.dataset.gerarCpf);
+    campo.value = gerarCpf();
+    campo.dispatchEvent(new Event('input', { bubbles: true }));
+    campo.focus();
+  });
+
   /* ---------- Mostrar/ocultar senha ---------- */
 
   document.addEventListener('click', (evento) => {

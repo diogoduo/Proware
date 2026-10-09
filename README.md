@@ -142,13 +142,15 @@ Sem configuração, os e-mails só ficam registrados no painel, em **E-mails**. 
 
 Os clientes fictícios (`@exemplo.com`) nunca recebem e-mails de verdade.
 
+**Endereço do site nos links:** no Render, o endereço vem sozinho da variável `RENDER_EXTERNAL_URL`. Em outra hospedagem (XAMPP publicado, VPS etc.), defina `APP_URL` com o endereço do site, por exemplo `https://minhaloja.com`. Sem ela, os e-mails saem sem link: por segurança, o site nunca monta links a partir do endereço que o visitante informa na requisição.
+
 ## Testes
 
 ```bash
 php tests/executar.php
 ```
 
-São 25 testes, sem dependências externas, num banco em memória. Eles cobrem as regras de compatibilidade, o recálculo dos preços do carrinho, a criação de contas e pedidos, o fluxo de situações do pedido, o bloqueio de login, a recuperação de senha, os e-mails, a edição do catálogo e as métricas do painel. O [GitHub Actions](.github/workflows/testes.yml) roda os testes em PHP 8.1, 8.2, 8.3 e 8.4 a cada envio, e também constrói a imagem Docker, sobe o site como no Render e confere as páginas.
+São 28 testes, sem dependências externas, num banco em memória. Eles cobrem as regras de compatibilidade, o recálculo dos preços do carrinho, a criação de contas e pedidos, o fluxo de situações do pedido, o bloqueio de login, a recuperação de senha, os e-mails, a edição do catálogo e as métricas do painel. O [GitHub Actions](.github/workflows/testes.yml) roda os testes em PHP 8.1, 8.2, 8.3 e 8.4 a cada envio, e também constrói a imagem Docker, sobe o site como no Render e confere as páginas.
 
 ## Estrutura
 
@@ -182,7 +184,8 @@ São 25 testes, sem dependências externas, num banco em memória. Eles cobrem a
 - A compatibilidade das peças é validada de novo no PHP antes de criar o pedido.
 - Consultas ao banco sempre preparadas (sem risco de SQL injection) e dinheiro guardado em centavos.
 - Senhas com `password_hash` e sessão renovada no login, com bloqueio temporário depois de várias senhas erradas.
-- Links de nova senha aleatórios, de uso único e válidos por 1 hora; o banco guarda só o hash deles. A página "Esqueci minha senha" responde igual exista ou não a conta.
+- Links de nova senha aleatórios, de uso único e válidos por 1 hora; o banco guarda só o hash deles. A página "Esqueci minha senha" responde igual exista ou não a conta, e o endereço dos links nunca vem do cabeçalho `Host` da requisição.
+- Atrás do proxy do Render, o bloqueio de login usa o IP real do visitante (cabeçalho da Cloudflare), não o do proxy.
 - Token CSRF em todos os formulários, e sair da conta só por POST.
 - Saídas escapadas com `htmlspecialchars` e Content Security Policy sem scripts nem estilos inline.
 - O painel responde "página não encontrada" para quem não é administrador, e as pastas `app/`, `docker/`, `ferramentas/` e `tests/` ficam bloqueadas para acesso pelo navegador.
