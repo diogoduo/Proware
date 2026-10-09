@@ -38,3 +38,40 @@ jobs:
           node-version: 22
       - name: Verificar a sintaxe dos scripts
         run: for arquivo in assets/js/*.js; do node --check "$arquivo"; done
+
+  docker:
+    name: Imagem Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir a imagem
+        run: docker build -t proware .
+
+      - name: Subir o site como no Render (porta 10000, modo demonstração)
+        run: |
+          docker run -d --name proware -p 8080:10000 -e PORT=10000 -e PROWARE_DEMO=1 proware
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:8080/ && break; sleep 1; done
+
+      - name: Conferir as páginas e os bloqueios
+        run: |
+          set -e
+          confere() {
+            codigo=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080/$1")
+            echo "/$1 -> $codigo (esperado $2)"
+            [ "$codigo" = "$2" ]
+          }
+          confere "" 200
+          confere pcs-prontos.php 200
+          confere "montar.php?perfil=jogos" 200
+          confere "produto.php?id=proware-pro" 200
+          confere esqueci-senha.php 200
+          confere admin/ 303
+          confere nao-existe 404
+          confere app/bootstrap.php 403
+          confere app/storage/proware.sqlite 403
+          curl -s http://localhost:8080/login.php | grep -q "visitante@proware.dev"
+
+      - name: Logs do contêiner
+        if: always()
+        run: docker logs proware

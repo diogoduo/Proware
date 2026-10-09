@@ -12,6 +12,7 @@ if (!$pedido) {
 
 $erroAcao = '';
 if (requisicao_post()) {
+    exigir_edicao_no_painel($admin, 'pedido.php?codigo=' . urlencode($codigo));
     if (!csrf_valido()) {
         $erroAcao = 'Sua sessão expirou. Tente novamente.';
     } else {

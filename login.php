@@ -61,7 +61,10 @@ require APP . '/views/topo.php';
                     <input id="email" name="email" type="email" autocomplete="email" required value="<?= e($email) ?>" autofocus>
                 </div>
                 <div class="campo">
-                    <label for="senha">Senha</label>
+                    <div class="campo__rotulo-linha">
+                        <label for="senha">Senha</label>
+                        <a href="esqueci-senha.php">Esqueci minha senha</a>
+                    </div>
                     <div class="campo-senha">
                         <input id="senha" name="senha" type="password" autocomplete="current-password" required>
                         <button class="campo-senha__alternar" type="button" data-mostrar-senha aria-label="Mostrar senha" aria-pressed="false"><?= icone('olho') ?></button>
@@ -69,6 +72,23 @@ require APP . '/views/topo.php';
                 </div>
                 <button class="botao botao--primario botao--grande botao--bloco" type="submit">Entrar <?= icone('seta') ?></button>
             </form>
+
+            <?php if (modo_demonstracao()): ?>
+                <div class="acessos-demo">
+                    <p><strong><?= icone('info') ?> Site em modo demonstração.</strong> Use um dos acessos de teste:</p>
+                    <dl>
+                        <div>
+                            <dt>Cliente com pedidos</dt>
+                            <dd><code><?= e(DEMO_CLIENTE_EMAIL) ?></code> · senha <code><?= e(DEMO_SENHA_CLIENTES) ?></code></dd>
+                        </div>
+                        <div>
+                            <dt>Painel administrativo (só leitura)</dt>
+                            <dd><code><?= e(DEMO_VISITANTE_EMAIL) ?></code> · senha <code><?= e(DEMO_VISITANTE_SENHA) ?></code></dd>
+                        </div>
+                    </dl>
+                    <p class="acessos-demo__nota">Os dados voltam ao início sempre que o servidor reinicia.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>

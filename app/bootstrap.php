@@ -32,7 +32,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
-        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        // Atrás do proxy da hospedagem, o HTTPS chega avisado no cabeçalho X-Forwarded-Proto.
+        'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https',
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -57,6 +59,8 @@ require APP . '/catalogo.php';
 require APP . '/usuarios.php';
 require APP . '/pedidos.php';
 require APP . '/mensagens.php';
+require APP . '/email.php';
+require APP . '/demo.php';
 
 // Erros inesperados viram uma página amigável (e o detalhe vai para o log do PHP).
 set_exception_handler(function (Throwable $erro): void {

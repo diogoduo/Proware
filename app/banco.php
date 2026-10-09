@@ -42,6 +42,9 @@ function banco(): PDO
     $pdo->exec('PRAGMA busy_timeout = 5000');
 
     migrar_banco($pdo);
+    if (modo_demonstracao() && $caminho !== ':memory:' && !$pdo->query('SELECT 1 FROM usuarios LIMIT 1')->fetchColumn()) {
+        preparar_modo_demonstracao();
+    }
     return $pdo;
 }
 
@@ -203,6 +206,34 @@ function migrar_banco(PDO $pdo): void
 
             semear_catalogo($pdo, require APP . '/dados/catalogo-inicial.php');
             importar_dados_json($pdo);
+        },
+
+        // Versão 2: acesso de visitante ao painel, recuperação de senha e registro de e-mails.
+        2 => function (PDO $pdo): void {
+            $pdo->exec(<<<'SQL'
+                ALTER TABLE usuarios ADD COLUMN somente_leitura INTEGER NOT NULL DEFAULT 0;
+
+                CREATE TABLE redefinicoes_senha (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    usuario_id  INTEGER NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+                    token_hash  TEXT    NOT NULL UNIQUE,
+                    expira_em   INTEGER NOT NULL,
+                    usado_em    INTEGER,
+                    criado_em   TEXT    NOT NULL
+                );
+
+                CREATE TABLE emails (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    para        TEXT    NOT NULL,
+                    assunto     TEXT    NOT NULL,
+                    html        TEXT    NOT NULL,
+                    texto       TEXT    NOT NULL,
+                    tipo        TEXT    NOT NULL DEFAULT 'geral',
+                    status      TEXT    NOT NULL,
+                    erro        TEXT,
+                    criado_em   TEXT    NOT NULL
+                );
+                SQL);
         },
     ];
 

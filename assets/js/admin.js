@@ -9,6 +9,7 @@
   const $ = (seletor, raiz = document) => raiz.querySelector(seletor);
   const $$ = (seletor, raiz = document) => [...raiz.querySelectorAll(seletor)];
   const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  const somenteLeitura = document.body.classList.contains('admin--somente-leitura');
 
   /* ---------- Gráfico de faturamento ---------- */
   // A altura das barras vem de data-proporcao (0 a 1). Fica no JavaScript porque a
@@ -62,6 +63,7 @@
     botao.disabled = true;
 
     const atualizar = () => {
+      if (somenteLeitura) return;
       const alterada = estadoDoFormulario(form) !== inicial;
       botao.disabled = !alterada;
       form.classList.toggle('is-alterada', alterada);
@@ -91,6 +93,16 @@
       });
     }
   });
+
+  /* ---------- Acesso de demonstração (somente leitura) ---------- */
+  // O servidor já recusa qualquer alteração; aqui os botões só deixam isso visível.
+
+  if (somenteLeitura) {
+    $$('form[method="post"]:not([action="sair.php"]) [type="submit"]').forEach((botao) => {
+      botao.disabled = true;
+      botao.title = 'Desativado no acesso de demonstração';
+    });
+  }
 
   /* ---------- Confirmações ---------- */
 

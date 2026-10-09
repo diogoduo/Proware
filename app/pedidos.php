@@ -153,7 +153,9 @@ function criar_pedido(array $usuario, array $carrinho, array $endereco, string $
         }
     });
 
-    return pedido_por_codigo($codigo);
+    $pedido = pedido_por_codigo($codigo);
+    email_pedido_confirmado($usuario, $pedido);
+    return $pedido;
 }
 
 /* ---------- Leitura ---------- */
@@ -312,7 +314,9 @@ function alterar_status_pedido(string $codigo, string $novo, string $rastreio = 
             ->execute([$pedido['id'], $novo, trim($observacao) ?: null, $quando]);
     });
 
-    return pedido_por_codigo($codigo);
+    $atualizado = pedido_por_codigo($codigo);
+    email_status_do_pedido($atualizado);
+    return $atualizado;
 }
 
 /** Data em que o pedido chegou a cada etapa (para a linha do tempo). */

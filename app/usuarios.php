@@ -16,6 +16,7 @@ function usuario_da_linha(array|false $linha): ?array
     }
     $linha['id'] = (int) $linha['id'];
     $linha['admin'] = (bool) $linha['admin'];
+    $linha['somente_leitura'] = (bool) ($linha['somente_leitura'] ?? false);
     return $linha;
 }
 
@@ -72,11 +73,11 @@ function validar_cadastro(array $dados): array
     return $erros + validar_nova_senha($dados['senha'], $dados['confirmar_senha']);
 }
 
-function criar_usuario(array $dados, bool $admin = false): array
+function criar_usuario(array $dados, bool $admin = false, bool $somenteLeitura = false): array
 {
     try {
         sql(
-            'INSERT INTO usuarios (nome, email, cpf, telefone, senha_hash, admin, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO usuarios (nome, email, cpf, telefone, senha_hash, admin, somente_leitura, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 preg_replace('/\s+/', ' ', trim($dados['nome'])),
                 strtolower(trim($dados['email'])),
@@ -84,6 +85,7 @@ function criar_usuario(array $dados, bool $admin = false): array
                 so_digitos($dados['telefone'] ?? ''),
                 password_hash($dados['senha'], PASSWORD_DEFAULT),
                 (int) $admin,
+                (int) $somenteLeitura,
                 agora(),
             ]
         );
@@ -231,4 +233,62 @@ function listar_clientes(string $busca = ''): array
          ORDER BY u.criado_em DESC",
         $parametros
     )->fetchAll();
+}
+
+/* ---------- Recuperação de senha ---------- */
+
+const VALIDADE_LINK_SENHA = 3600; // 1 hora
+
+/**
+ * Cria um link de redefinição de senha. Só o hash do token fica no banco:
+ * quem tiver acesso ao banco não consegue usar o link.
+ */
+function criar_link_redefinicao(array $usuario): string
+{
+    $token = bin2hex(random_bytes(32));
+    sql('UPDATE redefinicoes_senha SET usado_em = ? WHERE usuario_id = ? AND usado_em IS NULL', [time(), $usuario['id']]);
+    sql('INSERT INTO redefinicoes_senha (usuario_id, token_hash, expira_em, criado_em) VALUES (?, ?, ?, ?)',
+        [$usuario['id'], hash('sha256', $token), time() + VALIDADE_LINK_SENHA, agora()]);
+    return url_do_site('redefinir-senha.php?token=' . $token);
+}
+
+/** Usuário dono de um token ainda válido (ou null se expirou, foi usado ou não existe). */
+function usuario_do_token(string $token): ?array
+{
+    if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+        return null;
+    }
+    $linha = sql(
+        'SELECT usuario_id FROM redefinicoes_senha WHERE token_hash = ? AND usado_em IS NULL AND expira_em > ?',
+        [hash('sha256', $token), time()]
+    )->fetch();
+    return $linha ? usuario_por_id((int) $linha['usuario_id']) : null;
+}
+
+function redefinir_senha_com_token(string $token, string $novaSenha): bool
+{
+    $usuario = usuario_do_token($token);
+    if (!$usuario) {
+        return false;
+    }
+    em_transacao(function () use ($usuario, $novaSenha) {
+        alterar_senha($usuario['id'], $novaSenha);
+        sql('UPDATE redefinicoes_senha SET usado_em = ? WHERE usuario_id = ? AND usado_em IS NULL', [time(), $usuario['id']]);
+    });
+    limpar_falhas_login($usuario['email']);
+    return true;
+}
+
+/* ---------- Painel em modo somente leitura ---------- */
+
+/**
+ * Contas de visitante (modo demonstração) veem o painel mas não alteram nada.
+ * Chamada antes de qualquer alteração feita pelo painel.
+ */
+function exigir_edicao_no_painel(array $admin, string $voltar): void
+{
+    if (!empty($admin['somente_leitura'])) {
+        flash('info', 'Este é o acesso de demonstração: dá para ver tudo, mas as alterações estão desativadas.');
+        redirecionar($voltar);
+    }
 }

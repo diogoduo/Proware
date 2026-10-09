@@ -1,0 +1,24 @@
+# Publicação no Render (https://render.com): New > Blueprint > escolha este repositório.
+# No plano gratuito os arquivos são apagados quando o serviço reinicia ou "dorme"
+# (15 min sem visitas), por isso o site roda em modo demonstração: o banco é
+# recriado com dados de exemplo a cada início.
+services:
+  - type: web
+    name: proware
+    runtime: docker
+    plan: free
+    region: virginia
+    healthCheckPath: /
+    envVars:
+      - key: PROWARE_DEMO
+        value: "1"
+      # Seu acesso de administrador (com permissão para alterar tudo)
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_SENHA
+        sync: false
+      # Opcional: envio de e-mails de verdade pelo Brevo (https://www.brevo.com)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_REMETENTE
+        sync: false

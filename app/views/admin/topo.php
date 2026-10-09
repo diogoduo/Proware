@@ -16,6 +16,9 @@ $menuAdmin = [
     'clientes'  => ['Clientes', 'admin/clientes.php', 'usuarios', 0],
     'catalogo'  => ['Catálogo e preços', 'admin/catalogo.php', 'etiqueta', 0],
 ];
+if (!$admin['somente_leitura']) {
+    $menuAdmin['emails'] = ['E-mails', 'admin/emails.php', 'email', 0];
+}
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -34,7 +37,7 @@ $menuAdmin = [
     <link rel="stylesheet" href="<?= asset('assets/css/admin.css') ?>">
     <script src="<?= asset('assets/js/admin.js') ?>" defer></script>
 </head>
-<body class="admin">
+<body class="admin<?= $admin['somente_leitura'] ? ' admin--somente-leitura' : '' ?>">
 <a class="pular-conteudo" href="<?= e($menuAdmin[$secao][1] ?? 'admin/index.php') ?>#conteudo">Pular para o conteúdo</a>
 
 <div class="admin-layout">
@@ -88,4 +91,10 @@ $menuAdmin = [
                 <div class="admin-topo__acoes"><?= $acoesTopo ?></div>
             <?php endif; ?>
         </header>
+        <?php if ($admin['somente_leitura']): ?>
+            <div class="alerta alerta--info admin-aviso-demo">
+                <?= icone('olho') ?>
+                <p><strong>Acesso de demonstração.</strong> Você pode ver todo o painel, mas as alterações estão desativadas.</p>
+            </div>
+        <?php endif; ?>
         <?php parcial('alertas'); ?>

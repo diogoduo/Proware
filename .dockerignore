@@ -1,0 +1,11 @@
+# Fora da imagem: histórico, documentação, backups e dados locais
+.git
+.github
+docs
+*.rar
+app/storage/*
+!app/storage/.gitkeep
+Thumbs.db
+desktop.ini
+.vscode
+.idea

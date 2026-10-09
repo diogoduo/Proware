@@ -177,6 +177,10 @@
   color: var(--texto-2);
 }
 
+.admin-aviso-demo {
+  margin-bottom: 20px;
+}
+
 .admin .alertas-pagina {
   width: auto;
   margin: 0 0 20px;
@@ -759,6 +763,49 @@
 .historico__texto small {
   display: block;
   color: var(--texto-3);
+}
+
+/* ---------- E-mails ---------- */
+
+.email-detalhe {
+  margin-bottom: 20px;
+}
+
+.email-detalhe__previa {
+  display: block;
+  width: 100%;
+  height: 560px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: #f4f3f7;
+}
+
+.email-detalhe__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.email-detalhe__texto {
+  margin: 10px 0 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--superficie-2);
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tabela-admin__link--quebra {
+  white-space: normal;
+}
+
+.tabela-admin tr.is-selecionada {
+  background: var(--roxo-claro);
 }
 
 /* ---------- Mensagens ---------- */

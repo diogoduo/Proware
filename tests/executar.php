@@ -292,6 +292,71 @@ teste('valida o endereço de entrega', function () {
     iguais(['cep', 'rua', 'numero', 'bairro', 'cidade', 'uf'], array_keys($erros));
 });
 
+/* ---------- Recuperação de senha e e-mails ---------- */
+
+function token_do_link(string $link): string
+{
+    parse_str((string) parse_url($link, PHP_URL_QUERY), $parametros);
+    return $parametros['token'] ?? '';
+}
+
+teste('redefine a senha com link de uso único', function () {
+    $usuario = cliente_de_teste();
+    $token = token_do_link(criar_link_redefinicao($usuario));
+
+    iguais($usuario['id'], usuario_do_token($token)['id'] ?? null, 'token válido');
+    confirmar(redefinir_senha_com_token($token, 'outraSenha77'), 'não redefiniu');
+    confirmar(autenticar($usuario['email'], 'outraSenha77') !== null, 'nova senha não funciona');
+    iguais(null, autenticar($usuario['email'], 'senha12345'), 'senha antiga ainda funciona');
+    confirmar(!redefinir_senha_com_token($token, 'maisUma123'), 'link usado duas vezes');
+    iguais(null, usuario_do_token('nao-e-um-token'), 'token em formato inválido');
+});
+
+teste('link de senha expira e um novo link anula o anterior', function () {
+    $usuario = cliente_de_teste();
+    $primeiro = token_do_link(criar_link_redefinicao($usuario));
+    $segundo = token_do_link(criar_link_redefinicao($usuario));
+    iguais(null, usuario_do_token($primeiro), 'link antigo continua valendo');
+    confirmar(usuario_do_token($segundo) !== null, 'link novo não vale');
+
+    sql('UPDATE redefinicoes_senha SET expira_em = ? WHERE token_hash = ?', [time() - 1, hash('sha256', $segundo)]);
+    iguais(null, usuario_do_token($segundo), 'link expirado continua valendo');
+});
+
+teste('registra os e-mails da loja sem enviar para domínios fictícios', function () {
+    $antes = count(listar_emails(1000));
+    $usuario = cliente_de_teste();
+    $pedido = criar_pedido($usuario, carrinho([['tipo' => 'produto', 'id' => 'mouse-gamer-rgb', 'qtd' => 1]]), endereco_de_teste(), 'pix');
+    alterar_status_pedido($pedido['codigo'], 'pago');
+
+    $emails = listar_emails(1000);
+    iguais($antes + 2, count($emails), 'e-mails de confirmação e de pagamento');
+    iguais($usuario['email'], $emails[0]['para'], 'destinatário');
+    iguais('registrado', $emails[0]['status'], 'situação sem Brevo configurado');
+    confirmar(str_contains($emails[1]['html'], $pedido['codigo']), 'código do pedido no e-mail');
+    confirmar(str_contains($emails[1]['texto'], 'pedido.php?codigo=' . $pedido['codigo']), 'link do pedido no texto');
+
+    emails_silenciados(true);
+    enviar_email('x@teste.com', 'X', 'Não registrar', '<p>x</p>', 'x');
+    emails_silenciados(false);
+    iguais($antes + 2, count(listar_emails(1000)), 'e-mail silenciado foi registrado');
+});
+
+teste('conta de visitante do painel é somente leitura', function () {
+    $visitante = criar_usuario(['nome' => 'Visitante Teste', 'email' => 'visitante@teste.com', 'senha' => 'visita1234'], true, true);
+    confirmar($visitante['admin'] && $visitante['somente_leitura'], 'visitante sem as marcações certas');
+    confirmar(!cliente_de_teste()['somente_leitura'], 'cliente marcado como somente leitura');
+});
+
+teste('gera os dados de demonstração sem disparar e-mails', function () {
+    $emailsAntes = count(listar_emails(1000));
+    $resumo = criar_dados_de_demonstracao();
+    iguais(['clientes' => 9, 'pedidos' => 14, 'mensagens' => 4], $resumo, 'resumo');
+    iguais($emailsAntes, count(listar_emails(1000)), 'e-mails disparados na demonstração');
+    confirmar(autenticar(DEMO_CLIENTE_EMAIL, DEMO_SENHA_CLIENTES) !== null, 'cliente de demonstração não entra');
+    iguais(1, contar_pedidos_por_status()['cancelado'] >= 1 ? 1 : 0, 'há pedido cancelado');
+});
+
 /* ---------- Execução ---------- */
 
 $falhas = 0;

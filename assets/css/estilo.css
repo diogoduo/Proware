@@ -2567,6 +2567,75 @@ li:not(.is-escolhido) .resumo-montagem__peca span {
   font-weight: 600;
 }
 
+.campo__rotulo-linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.campo__rotulo-linha a {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.autenticacao--simples {
+  grid-template-columns: minmax(0, 520px);
+  justify-content: center;
+}
+
+.autenticacao--simples .estado-vazio__icone {
+  margin: 0 0 18px;
+}
+
+.autenticacao--simples h1 + .cartao-formulario__sub {
+  margin-top: 10px;
+}
+
+.acessos-demo {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border: 1px dashed var(--borda-forte);
+  border-radius: 12px;
+  background: var(--superficie-2);
+  font-size: 14px;
+}
+
+.acessos-demo strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.acessos-demo dl {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.acessos-demo dt {
+  color: var(--texto-3);
+  font-size: 12.5px;
+}
+
+.acessos-demo dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.acessos-demo code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--superficie);
+  font-size: 13px;
+}
+
+.acessos-demo__nota {
+  margin-top: 10px;
+  color: var(--texto-3);
+  font-size: 12.5px;
+}
+
 .opcional {
   color: var(--texto-3);
   font-weight: 400;

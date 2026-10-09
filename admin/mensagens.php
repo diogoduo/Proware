@@ -5,6 +5,7 @@ require dirname(__DIR__) . '/app/bootstrap.php';
 $admin = exigir_admin('admin/mensagens.php');
 
 if (requisicao_post()) {
+    exigir_edicao_no_painel($admin, 'mensagens.php');
     if (csrf_valido() && isset(STATUS_MENSAGEM[post('marcar')])) {
         marcar_mensagem((int) post('id'), post('marcar'));
         flash('sucesso', 'Mensagem marcada como ' . mb_lower_seguro(STATUS_MENSAGEM[post('marcar')]['nome']) . '.');

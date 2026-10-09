@@ -16,6 +16,7 @@ function numero_enviado(string $campo): ?float
 
 if (requisicao_post()) {
     $aba = isset($abas[post('aba')]) ? post('aba') : 'pecas';
+    exigir_edicao_no_painel($admin, 'catalogo.php?aba=' . $aba);
     $id = post('id');
     try {
         if (!csrf_valido()) {

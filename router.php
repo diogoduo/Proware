@@ -6,7 +6,7 @@
  */
 $caminho = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 
-if (preg_match('#(^|/)(\.|(app|ferramentas|tests)(/|$)|router\.php)#', ltrim($caminho, '/'))) {
+if (preg_match('#(^|/)(\.|(app|docker|ferramentas|tests)(/|$)|router\.php)#', ltrim($caminho, '/'))) {
     http_response_code(403);
     exit('Acesso negado.');
 }
