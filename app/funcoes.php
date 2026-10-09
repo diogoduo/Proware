@@ -31,6 +31,15 @@ function asset(string $caminho): string
     return e($caminho) . '?v=' . $versao;
 }
 
+/**
+ * Endereço de uma página da raiz do site. Dentro de /admin os redirecionamentos
+ * precisam subir uma pasta ("../login.php").
+ */
+function url_raiz(string $caminho = ''): string
+{
+    return (defined('NA_AREA_ADMIN') ? '../' : '') . $caminho;
+}
+
 function redirecionar(string $url): void
 {
     header('Location: ' . $url, true, 303);
@@ -65,7 +74,7 @@ function get(string $campo): string
  */
 function destino_seguro(mixed $destino, string $padrao = 'conta.php'): string
 {
-    if (is_string($destino) && preg_match('/^[a-z0-9-]+\.php(\?[a-zA-Z0-9=&_-]*)?$/', $destino)) {
+    if (is_string($destino) && preg_match('/^(admin\/)?[a-z0-9-]+\.php(\?[a-zA-Z0-9=&_%-]*)?$/', $destino)) {
         return $destino;
     }
     return $padrao;
@@ -170,6 +179,33 @@ function mb_strlen_seguro(string $texto): int
     return function_exists('mb_strlen') ? mb_strlen($texto, 'UTF-8') : strlen($texto);
 }
 
+function mb_substr_seguro(string $texto, int $inicio, int $tamanho): string
+{
+    return function_exists('mb_substr') ? mb_substr($texto, $inicio, $tamanho, 'UTF-8') : substr($texto, $inicio, $tamanho);
+}
+
+function mb_lower_seguro(string $texto): string
+{
+    return function_exists('mb_strtolower') ? mb_strtolower($texto, 'UTF-8') : strtolower($texto);
+}
+
+function mb_strtoupper_seguro(string $texto): string
+{
+    return function_exists('mb_strtoupper') ? mb_strtoupper($texto, 'UTF-8') : strtoupper($texto);
+}
+
+/** Valor curto para eixos e destaques: 12500 → "R$ 12,5 mil". */
+function valor_compacto(float $valor): string
+{
+    if ($valor >= 1000000) {
+        return 'R$ ' . rtrim(rtrim(number_format($valor / 1000000, 1, ',', '.'), '0'), ',') . ' mi';
+    }
+    if ($valor >= 1000) {
+        return 'R$ ' . rtrim(rtrim(number_format($valor / 1000, 1, ',', '.'), '0'), ',') . ' mil';
+    }
+    return 'R$ ' . number_format($valor, 0, ',', '.');
+}
+
 function primeiro_nome(string $nome): string
 {
     return explode(' ', trim($nome))[0] ?? $nome;
@@ -181,6 +217,30 @@ function data_br(string $iso): string
     return $data ? $data->format('d/m/Y \à\s H:i') : $iso;
 }
 
+/* ---------- Cache por requisição ---------- */
+
+function &memo_armazem(): array
+{
+    static $cache = [];
+    return $cache;
+}
+
+/** Calcula um valor uma única vez por requisição (ex.: o catálogo lido do banco). */
+function memo(string $chave, callable $calcular): mixed
+{
+    $cache = &memo_armazem();
+    if (!array_key_exists($chave, $cache)) {
+        $cache[$chave] = $calcular();
+    }
+    return $cache[$chave];
+}
+
+function limpar_memo(): void
+{
+    $cache = &memo_armazem();
+    $cache = [];
+}
+
 /* ---------- Renderização ---------- */
 
 /** Inclui um trecho de HTML de app/views com as variáveis informadas. */
@@ -188,6 +248,18 @@ function parcial(string $nome, array $variaveis = []): void
 {
     extract($variaveis, EXTR_SKIP);
     require APP . '/views/' . $nome . '.php';
+}
+
+/** Etiqueta colorida (status de pedido, de mensagem etc.). */
+function etiqueta(string $texto, string $classe): string
+{
+    return '<span class="etiqueta etiqueta--' . e($classe) . '">' . e($texto) . '</span>';
+}
+
+function etiqueta_pedido(string $status): string
+{
+    $info = STATUS_PEDIDO[$status] ?? ['nome' => $status, 'classe' => 'info'];
+    return etiqueta($info['nome'], $info['classe']);
 }
 
 /** Mensagem de erro de um campo de formulário (ou nada). */

@@ -6,9 +6,9 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Bloqueia arquivos ocultos (.git, .env...) e a pasta app/
+    # Bloqueia arquivos ocultos (.git, .env...) e as pastas internas
     RewriteRule (^|/)\. - [F]
-    RewriteRule ^app(/|$) - [F]
+    RewriteRule ^(app|ferramentas|tests)(/|$) - [F]
 
     # Endereços que não existem mostram a página 404 da loja
     RewriteCond %{REQUEST_FILENAME} !-f

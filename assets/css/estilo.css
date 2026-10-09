@@ -272,6 +272,16 @@ address {
   background: rgb(255 255 255 / 0.16);
 }
 
+.botao--perigo {
+  border-color: #f0c3cc;
+  background: var(--superficie);
+  color: var(--erro);
+}
+
+.botao--perigo:hover {
+  background: var(--erro-claro);
+}
+
 .botao--texto {
   padding-inline: 12px;
   color: var(--roxo);
@@ -385,6 +395,23 @@ address {
 .etiqueta--aviso {
   background: var(--aviso-claro);
   color: var(--aviso);
+}
+
+.etiqueta--info {
+  background: var(--info-claro);
+  color: var(--info);
+}
+
+.etiqueta--erro {
+  background: var(--erro-claro);
+  color: var(--erro);
+}
+
+.etiqueta--mini {
+  margin-left: 6px;
+  padding: 2px 7px;
+  font-size: 11px;
+  vertical-align: 1px;
 }
 
 .sobretitulo {
@@ -549,6 +576,30 @@ address {
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.cabecalho__painel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 8px;
+  color: var(--escuro-texto);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cabecalho__painel:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+
+.cabecalho__painel .icone {
+  width: 18px;
+  height: 18px;
+  color: var(--roxo-suave);
 }
 
 .cabecalho__conta:hover,
@@ -2733,6 +2784,32 @@ textarea:focus {
   margin: 0 0 20px;
 }
 
+.conta__sair {
+  margin-top: 4px;
+}
+
+.grade-formularios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.grade-formularios .cartao-formulario h2 {
+  margin-bottom: 18px;
+  font-size: 20px;
+}
+
+.grade-formularios .formulario .botao {
+  justify-self: start;
+}
+
+input:disabled {
+  background: var(--superficie-2);
+  color: var(--texto-3);
+  cursor: not-allowed;
+}
+
 .dados-lista > div {
   display: flex;
   justify-content: space-between;
@@ -3043,6 +3120,14 @@ textarea:focus {
 .linha-tempo .is-feita {
   color: var(--texto);
   font-weight: 600;
+}
+
+.linha-tempo small {
+  margin-top: -6px;
+  color: var(--texto-3);
+  font-size: 12px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .itens-pedido li {
@@ -3595,8 +3680,13 @@ textarea:focus {
   }
 
   .grade-valores,
-  .formas-pagamento {
+  .formas-pagamento,
+  .grade-formularios {
     grid-template-columns: 1fr;
+  }
+
+  .cabecalho__painel span {
+    display: none;
   }
 
   .faixa-chamada {

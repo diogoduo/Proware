@@ -13,13 +13,19 @@ $erro = '';
 
 if (requisicao_post()) {
     $email = post('email');
+    $bloqueio = minutos_de_bloqueio($email);
     if (!csrf_valido()) {
         $erro = 'Sua sessão expirou. Tente novamente.';
+    } elseif ($bloqueio > 0) {
+        $erro = "Muitas tentativas com este e-mail. Tente de novo em $bloqueio "
+            . ($bloqueio === 1 ? 'minuto.' : 'minutos.');
     } elseif ($usuario = autenticar($email, post('senha', false))) {
+        limpar_falhas_login($email);
         iniciar_sessao($usuario);
         flash('sucesso', 'Que bom ver você, ' . primeiro_nome($usuario['nome']) . '!');
-        redirecionar($voltar);
+        redirecionar($usuario['admin'] && $voltar === 'conta.php' ? 'admin/index.php' : $voltar);
     } else {
+        registrar_falha_login($email);
         $erro = 'E-mail ou senha incorretos.';
     }
 }

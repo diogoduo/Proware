@@ -92,7 +92,7 @@ parcial('topo-pagina', compact('titulo', 'subtitulo'));
             <p class="sobretitulo">Nossa história</p>
             <h2 class="secao__titulo">De projeto de escola a loja completa</h2>
             <p>A Proware começou no ensino médio, como um trabalho em grupo: quatro páginas em HTML, um slider em jQuery e muita vontade de criar algo nosso. O logo desta seção é daquela época.</p>
-            <p>Esta é a versão 2.0, refeita do zero com as mesmas linguagens (HTML, CSS, JavaScript e PHP), agora com configurador de PC, carrinho, cadastro de clientes e pedidos.</p>
+            <p>Esta é a versão 2.0, refeita do zero com as mesmas linguagens (HTML, CSS, JavaScript e PHP), agora com configurador de PC, carrinho, cadastro de clientes, pedidos e painel administrativo.</p>
         </div>
     </div>
 </section>

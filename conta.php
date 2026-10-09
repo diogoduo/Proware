@@ -32,7 +32,7 @@ parcial('topo-pagina', compact('titulo', 'subtitulo'));
                                     <strong>Pedido <?= e($pedido['codigo']) ?></strong>
                                     <span><?= e(data_br($pedido['criado_em'])) ?></span>
                                 </div>
-                                <span class="etiqueta<?= $pedido['status'] === 'Pagamento aprovado' ? ' etiqueta--sucesso' : ' etiqueta--aviso' ?>"><?= e($pedido['status']) ?></span>
+                                <?= etiqueta_pedido($pedido['status']) ?>
                             </div>
                             <ul class="cartao-pedido__itens">
                                 <?php foreach ($pedido['itens'] as $item): ?>
@@ -59,9 +59,10 @@ parcial('topo-pagina', compact('titulo', 'subtitulo'));
                     <div><dt>Celular</dt><dd><?= e(formatar_telefone($usuario['telefone'])) ?></dd></div>
                     <div><dt>Cliente desde</dt><dd><?= e(date_create($usuario['criado_em'])->format('d/m/Y')) ?></dd></div>
                 </dl>
-                <form method="post" action="sair.php">
+                <a class="botao botao--contorno botao--bloco" href="editar-conta.php"><?= icone('editar') ?> Editar dados e senha</a>
+                <form class="conta__sair" method="post" action="sair.php">
                     <?= campo_csrf() ?>
-                    <button class="botao botao--contorno botao--bloco" type="submit"><?= icone('sair') ?> Sair da conta</button>
+                    <button class="botao botao--texto botao--bloco" type="submit"><?= icone('sair') ?> Sair da conta</button>
                 </form>
             </div>
             <div class="cartao cartao--destaque">

@@ -52,7 +52,22 @@ if (!headers_sent()) {
 
 require APP . '/funcoes.php';
 require APP . '/icones.php';
+require APP . '/banco.php';
 require APP . '/catalogo.php';
-require APP . '/armazenamento.php';
 require APP . '/usuarios.php';
 require APP . '/pedidos.php';
+require APP . '/mensagens.php';
+
+// Erros inesperados viram uma página amigável (e o detalhe vai para o log do PHP).
+set_exception_handler(function (Throwable $erro): void {
+    error_log((string) $erro);
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, 'Erro: ' . $erro->getMessage() . PHP_EOL);
+        exit(1);
+    }
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    $detalhe = $erro instanceof ErroDeConfiguracao ? $erro->getMessage() : null;
+    require APP . '/views/erro.php';
+});

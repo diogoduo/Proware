@@ -6,13 +6,7 @@ $subtitulo = 'Dúvida sobre peças, pedidos ou garantia? Mande uma mensagem e re
 $descricao = 'Fale com a equipe Proware: dúvidas sobre montagem de PC, pedidos, garantia e suporte.';
 $pagina = 'contato';
 
-$assuntos = [
-    'montagem' => 'Ajuda para montar meu PC',
-    'produto'  => 'Dúvida sobre um produto',
-    'pedido'   => 'Meu pedido',
-    'garantia' => 'Garantia e suporte',
-    'outro'    => 'Outro assunto',
-];
+$assuntos = ASSUNTOS_CONTATO;
 
 $usuario = usuario_logado();
 $dados = [

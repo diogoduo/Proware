@@ -5,7 +5,7 @@ $titulo = LOJA['slogan'];
 $pagina = 'inicio';
 
 $pcsDestaque = array_filter(produtos_do_tipo('pc'), fn ($p) => $p['destaque']);
-$perifericos = produtos_do_tipo('periferico');
+$perifericos = array_filter(produtos_do_tipo('periferico'), fn ($p) => $p['destaque']);
 $exemplo = perfis()['jogos']['pecas'];
 $equipe = ['barbara', 'caio', 'diogo', 'eduardo', 'estela', 'gabriel', 'luan', 'maria-eduarda'];
 
@@ -105,11 +105,12 @@ require APP . '/views/topo.php';
             </div>
             <ul>
                 <?php foreach (categorias() as $categoria => $info): ?>
+                    <?php if (!$peca = componente($exemplo[$categoria] ?? '')) continue; ?>
                     <li>
                         <span class="previa-montagem__icone"><?= icone($info['icone']) ?></span>
                         <span class="previa-montagem__peca">
                             <small><?= e($info['nome']) ?></small>
-                            <?= e(componente($exemplo[$categoria])['nome']) ?>
+                            <?= e($peca['nome']) ?>
                         </span>
                     </li>
                 <?php endforeach; ?>
@@ -122,6 +123,7 @@ require APP . '/views/topo.php';
     </div>
 </section>
 
+<?php if ($pcsDestaque): ?>
 <section class="secao secao--alternada">
     <div class="container">
         <div class="secao__cabecalho">
@@ -138,6 +140,7 @@ require APP . '/views/topo.php';
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <section class="secao">
     <div class="container">
@@ -162,6 +165,7 @@ require APP . '/views/topo.php';
     </div>
 </section>
 
+<?php if ($perifericos): ?>
 <section class="secao secao--alternada" id="perifericos">
     <div class="container">
         <div class="secao__cabecalho">
@@ -178,6 +182,7 @@ require APP . '/views/topo.php';
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <section class="secao">
     <div class="container chamada">

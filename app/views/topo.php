@@ -23,6 +23,7 @@ $menu = [
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php if (defined('NA_AREA_ADMIN')): ?><base href="../"><?php endif; ?>
     <title><?= e($titulo) ?> | Proware</title>
     <meta name="description" content="<?= e($descricao) ?>">
     <meta name="theme-color" content="#0f0b18">
@@ -76,6 +77,9 @@ $menu = [
         </nav>
 
         <div class="cabecalho__acoes">
+            <?php if ($usuarioLogado && $usuarioLogado['admin']): ?>
+                <a class="cabecalho__painel" href="admin/index.php"><?= icone('painel') ?><span>Painel</span></a>
+            <?php endif; ?>
             <?php if ($usuarioLogado): ?>
                 <a class="cabecalho__conta" href="conta.php"<?= $pagina === 'conta' ? ' aria-current="page"' : '' ?>>
                     <?= icone('usuario') ?>

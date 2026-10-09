@@ -13,9 +13,7 @@ $novo = get('novo') === '1';
 $titulo = 'Pedido ' . $pedido['codigo'];
 $pagina = 'conta';
 $pagamento = FORMAS_PAGAMENTO[$pedido['pagamento']];
-$aprovado = $pedido['status'] === 'Pagamento aprovado';
-$etapas = ['Pedido recebido', 'Pagamento aprovado', 'Montagem e testes', 'Enviado', 'Entregue'];
-$etapaAtual = $aprovado ? 1 : 0;
+$datas = datas_das_etapas($pedido);
 $endereco = $pedido['endereco'];
 
 require APP . '/views/topo.php';
@@ -50,19 +48,24 @@ require APP . '/views/topo.php';
                     <small>Feito em</small>
                     <strong><?= e(data_br($pedido['criado_em'])) ?></strong>
                 </div>
-                <span class="etiqueta<?= $aprovado ? ' etiqueta--sucesso' : ' etiqueta--aviso' ?>"><?= e($pedido['status']) ?></span>
+                <?= etiqueta_pedido($pedido['status']) ?>
             </div>
 
-            <ol class="linha-tempo" aria-label="Andamento do pedido">
-                <?php foreach ($etapas as $i => $etapa): ?>
-                    <li class="<?= $i <= $etapaAtual ? 'is-feita' : '' ?><?= $i === $etapaAtual ? ' is-atual' : '' ?>"<?= $i === $etapaAtual ? ' aria-current="step"' : '' ?>>
-                        <span class="linha-tempo__ponto"><?= $i <= $etapaAtual ? icone('check') : '' ?></span>
-                        <span><?= e($etapa) ?></span>
-                    </li>
-                <?php endforeach; ?>
-            </ol>
+            <?php parcial('linha-tempo', ['pedido' => $pedido]); ?>
 
-            <?php if (!$aprovado): ?>
+            <?php if ($pedido['status'] === 'cancelado'): ?>
+                <div class="alerta alerta--erro">
+                    <?= icone('alerta') ?>
+                    <p><strong>Pedido cancelado em <?= e(data_br($datas['cancelado'] ?? $pedido['atualizado_em'])) ?>.</strong> Se o pagamento já tinha sido feito, o valor é devolvido na mesma forma de pagamento.</p>
+                </div>
+            <?php elseif ($pedido['rastreio']): ?>
+                <div class="alerta alerta--sucesso">
+                    <?= icone('caminhao') ?>
+                    <p><strong>Código de rastreio: <span class="codigo"><?= e($pedido['rastreio']) ?></span></strong>. Use-o no site da transportadora para acompanhar a entrega.</p>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($pedido['status'] === 'recebido'): ?>
                 <div class="alerta alerta--info">
                     <?= icone($pagamento['icone']) ?>
                     <p>

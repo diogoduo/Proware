@@ -2,11 +2,11 @@
 /**
  * Roteador para o servidor embutido do PHP:
  *   php -S localhost:8000 router.php
- * Faz o mesmo papel do .htaccess: bloqueia a pasta app/ e mostra a página 404.
+ * Faz o mesmo papel do .htaccess: bloqueia as pastas internas e mostra a página 404.
  */
 $caminho = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 
-if (preg_match('#(^|/)(\.|app(/|$)|router\.php)#', ltrim($caminho, '/'))) {
+if (preg_match('#(^|/)(\.|(app|ferramentas|tests)(/|$)|router\.php)#', ltrim($caminho, '/'))) {
     http_response_code(403);
     exit('Acesso negado.');
 }
