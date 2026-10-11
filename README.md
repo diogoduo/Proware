@@ -4,7 +4,7 @@
 
 Loja online de computadores onde você **monta o seu PC peça por peça**, com checagem de compatibilidade em tempo real, ou escolhe um PC pronto. Tem também um **painel administrativo** para acompanhar vendas, mudar a situação dos pedidos e alterar preços.
 
-**Veja no ar: [proware.onrender.com](https://proware.onrender.com)** (o primeiro acesso pode levar cerca de 1 minuto, enquanto o servidor gratuito acorda). Os acessos de teste da loja e do painel aparecem na página de login.
+**Veja no ar: [proware.onrender.com](https://proware.onrender.com)** (das 8h à meia-noite ele fica sempre pronto; de madrugada, o primeiro acesso pode levar cerca de 1 minuto, enquanto o servidor gratuito acorda). Os acessos de teste da loja e do painel aparecem na página de login.
 
 O projeto começou no ensino médio como um site estático de quatro páginas. Esta é a versão 2.0, refeita do zero **com as mesmas linguagens** (HTML, CSS, JavaScript e PHP), sem frameworks.
 
@@ -129,7 +129,7 @@ O repositório já vem pronto para o [Render](https://render.com), que tem plano
 
 Cada envio para o GitHub publica a nova versão sozinho.
 
-**Sobre o plano gratuito:** o site "dorme" depois de 15 minutos sem visitas e leva cerca de 1 minuto para acordar. Os arquivos também são apagados quando ele reinicia, por isso o site publicado roda em **modo demonstração** (`PROWARE_DEMO=1`): sempre que começa, recria os dados de exemplo e os acessos de teste, mostrados na página de login. Para guardar dados de verdade, seria preciso um plano pago com disco persistente.
+**Sobre o plano gratuito:** o site "dorme" depois de 15 minutos sem visitas e leva cerca de 1 minuto para acordar. Para evitar isso, o workflow [`manter-no-ar.yml`](.github/workflows/manter-no-ar.yml) acessa o site a cada 5 minutos das 8h à meia-noite (horário de Brasília). A madrugada fica de fora para não gastar todas as 750 horas gratuitas do mês, que são divididas entre todos os serviços da conta. Os arquivos também são apagados quando ele reinicia, por isso o site publicado roda em **modo demonstração** (`PROWARE_DEMO=1`): sempre que começa, recria os dados de exemplo e os acessos de teste, mostrados na página de login. Para guardar dados de verdade, seria preciso um plano pago com disco persistente.
 
 ## E-mails (Brevo)
 

@@ -1,0 +1,32 @@
+name: Manter o site acordado
+
+# No plano gratuito do Render o site "dorme" depois de 15 minutos sem visitas
+# e leva cerca de 1 minuto para acordar. Este agendamento acessa o site a cada
+# 5 minutos das 8h à meia-noite (horário de Brasília) para ele ficar pronto.
+#
+# Fica de fora a madrugada de propósito: as 750 horas gratuitas por mês são
+# divididas entre todos os serviços da conta. Das 8h às 24h são ~496 horas.
+# Para manter 24 horas, troque as duas linhas de "cron" por: - cron: '*/5 * * * *'
+
+on:
+  schedule:
+    - cron: '*/5 11-23 * * *' # 8h às 20h59 em Brasília (UTC-3)
+    - cron: '*/5 0-2 * * *'   # 21h às 23h59 em Brasília
+  workflow_dispatch:
+
+jobs:
+  acessar:
+    name: Acessar o site
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Abrir a página inicial
+        run: |
+          for tentativa in 1 2 3; do
+            resultado=$(curl -s -o /dev/null -w '%{http_code} em %{time_total}s' --max-time 100 https://proware.onrender.com/)
+            echo "Tentativa $tentativa: HTTP $resultado"
+            case "$resultado" in 200*) exit 0 ;; esac
+            sleep 15
+          done
+          echo "O site não respondeu com sucesso."
+          exit 1
